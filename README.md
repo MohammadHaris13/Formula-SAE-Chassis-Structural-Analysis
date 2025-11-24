@@ -11,114 +11,172 @@ The workflow followed a step-by-step approach from geometry simplification and b
 
 ---
 
-## Workflow Summary
+# Formula SAE Spaceframe Chassis — Structural Analysis (ANSYS Workbench)
 
-### **Step 1: Beam Extraction & Profile Assignment**
-
-* Imported the chassis geometry into **ANSYS SpaceClaim**.
-* Extracted **beam elements** from 3D solid members.
-* Used the **Connect Tool** to join open ends (max distance = 25 mm).
-* Assigned **tubular beam profiles**:
-
-  * Outer Diameter = 16 mm
-  * Inner Diameter = 12.5 mm
-* Verified connectivity and geometry integrity before import to Workbench.
+This project presents the **static structural analysis of a Formula SAE spaceframe chassis** using **ANSYS Workbench 2025 R2 (SpaceClaim + Mechanical)**. The analysis evaluates **strength, stiffness, and load-bearing capability** under real race conditions: **torsion, cornering, aero-cornering, and frontal impact**.
 
 ---
 
-### **Step 2: Suspension Arms & Wishbone Modeling**
+## Project Highlights
 
-* Imported **coordinate data (.txt)** for suspension points and created beams via **3D sketches**.
-* Constructed **upper and lower wishbones** using coordinate import and beam creation tools.
-* For rear arms:
-
-  * Created reference planes → used sketch tools → converted sketches to beams.
-  * Mirrored geometry with **Mirror Plane** for symmetry.
-* Split beams where required for later boundary condition definition.
-* Combined all chassis members into a single shared part for import to **ANSYS Mechanical**.
-
----
-
-### **Step 3: Joint Definition & Meshing**
-
-* Assigned **Structural Steel** as material.
-* Created **spherical** and **revolute joints** via *Object Generator*:
-
-  * Reference = Wishbone Vertices
-  * Mobile = Chassis Vertices
-  * Max Distance = 5 mm
-* Added **spring connections** (longitudinal stiffness = 40 N/mm) between chassis and uprights.
-* Generated **5 mm element-size mesh** for all beam members ensuring uniform discretization.
+| Feature | Description |
+|---------|-------------|
+| **Chassis Type** | Tubular Spaceframe |
+| **Analysis Method** | Beam-based FEA |
+| **Software** | ANSYS Workbench 2025 R2 |
+| **Material** | Structural Steel (Yield ≈ 250 MPa) |
+| **Suspension Representation** | Joints + Springs + Upright Constraints |
+| **Load Cases** | Torsion, Cornering, Aero + Cornering, Frontal Impact |
 
 ---
 
-### **Step 4: Load Cases & Boundary Conditions**
+## Modeling Workflow Summary
 
-#### 🔹 **Torsion Test**
+### **1) Beam Extraction & Section Assignment**
+- CAD imported to **SpaceClaim**.
+- Members converted into **beam elements**.
+- Connectivity corrected using **Connect Tool** (`max gap = 25 mm`).
+- Beam profile (for all tubes):
 
-* ±1500 N applied on front uprights in opposite directions.
-* Rear suspension mounts simply supported (no translation, free rotation).
-* Output: total deformation and stress via **Beam Tool**.
-* Stresses below yield → safe design under torsional load.
-
-#### 🔹 **Cornering Test**
-
-* 1 g lateral acceleration (X-direction) + standard gravity (Y-direction).
-* Added **point masses**: 70 kg driver and 25 kg engine.
-* Fixed supports applied at upright vertices.
-* Verified lateral stiffness and stress distribution.
-
-#### 🔹 **Aero + Cornering Test**
-
-* 2 g aerodynamic acceleration (X-direction) + gravity (Y-direction).
-* Uprights fixed, same as cornering setup.
-* Evaluated combined aero-cornering loads and deformation behavior.
-
-#### 🔹 **Frontal Impact Test**
-
-* 30 000 N frontal force applied on front bulkhead (Z-direction).
-* Rear suspension nodes simply supported.
-* Observed load transfer path and rear-frame stress concentration.
-* (Note: static simplification — dynamic crash simulation recommended for future work.)
+| Property | Value |
+|----------|-------|
+| Outer Diameter | **16 mm** |
+| Inner Diameter | **12.5 mm** |
 
 ---
 
-## Results Summary
+### **2) Suspension & Upright Construction**
+- Wishbones generated via imported **pickup point coordinates**.
+- Geometry mirrored for symmetry.
+- Splits added at upright contacts for joint definitions.
+- **Point masses** added:
+  - Driver: **70 kg**
+  - Engine/Rear Unit: **25 kg**
+- Applied via remote attachments to chassis nodes.
 
-| Test Type            | Load Applied      | Boundary Condition    | Observation / Result             |
-| -------------------- | ----------------- | --------------------- | -------------------------------- |
-| **Torsion Test**     | ±1500 N           | Rear simply supported | High rigidity, safe stress       |
-| **Cornering Test**   | 1 g + Gravity     | Uprights fixed        | Stable lateral stiffness         |
-| **Aero + Cornering** | 2 g + Gravity     | Uprights fixed        | Slight rise in deformation       |
-| **Frontal Impact**   | 30 000 N (Z-dir.) | Rear simply supported | Stress localized near rear frame |
+---
+
+### **3) Joints, Springs & Meshing**
+- **Material:** Structural Steel.
+- **Joints:** Spherical + Revolute via Object Generator (`search distance = 5 mm`).
+- **Spring elements:** Suspension stiffness ≈ **40 N/mm** axial.
+- **Mesh:** Global beam element sizing = **5 mm** (uniform discretization).
+
+---
+
+## Load Case Analysis & Results
+
+---
+
+### **1) Torsion Test**
+
+| Parameter | Value |
+|-----------|-------|
+| Load | ±1500 N at front uprights (opposite direction) |
+| Rear Constraints | Simply supported (translations fixed, free rotations) |
+
+**Results**
+
+| Output | Value |
+|--------|-------|
+| Max Deformation | **2.268 mm** |
+| Max Direct Stress | **11.176 MPa** |
+| Max Combined Stress | **≈ 202 MPa** |
+
+> **Conclusion:** High torsional rigidity, stresses below yield → **safe under race torque loads**.
+
+*Torsional stiffness calculation can be added if track width is provided.*
+
+---
+
+### **2) Cornering Test (1 g Lateral)**
+
+| Parameter | Value |
+|-----------|-------|
+| Lateral Acceleration | **9800 mm/s² (≈1 g)** |
+| Gravity | Included |
+| Supports | All Uprights Fixed |
+
+**Results**
+
+| Output | Value |
+|--------|-------|
+| Max Deformation | **0.825 mm** |
+| Max Axial Force | **1475.3 N** |
+| Max Direct Stress | **4.711 MPa** |
+| Max Combined Stress | **≈ 90.23 MPa** |
+
+> **Conclusion:** Very small lateral deformation (<1 mm). Safe with large stress margin.
+
+---
+
+### **3) Aero + Cornering Test (2 g Downforce + 1 g Cornering)**
+
+| Parameter | Value |
+|-----------|-------|
+| Lateral Aero Acceleration | **19600 mm/s² (≈2 g)** |
+| Gravity | Included |
+| Supports | All Uprights Fixed |
+
+**Results**
+
+| Output | Value |
+|--------|-------|
+| Max Deformation | **0.89088 mm** |
+| Max Direct Stress | **5.2027 MPa** |
+| Max Combined Stress | **≈ 96.849 MPa** |
+
+> **Conclusion:** Aero load slightly increases deformation but remains <1 mm; stresses far below yield.
+
+---
+
+### **4) Frontal Impact (Static Approximation)**
+
+| Parameter | Value |
+|-----------|-------|
+| Front Load | **30,000 N** applied at bulkhead |
+| Rear Nodes | Simply Supported |
+
+**Results**
+
+| Output | Value |
+|--------|-------|
+| Max Deformation | **10.52 mm** |
+| Max Bending Moment | **6.8211 × 10⁵ N·mm** |
+| Max Direct Stress | **7.043 MPa** |
+| Max Combined Stress | **315.34 MPa** |
+
+> **Observation:** Combined stresses exceed structural steel yield here, indicating the need for **localized reinforcement at front crash nodes** for severe impacts.
+
+*Recommendation:* thicker crash tubes + additional triangular bracing + explicit crash simulation.
+
+---
+## Summary Table (All Load Cases)
+
+| Load Case | Max Deformation | Max Combined Stress | Safety Evaluation |
+|-----------|-----------------|--------------------|-------------------|
+| **Torsion** | 2.268 mm | 202 MPa | Safe |
+| **Cornering** | 0.825 mm | 90.23 MPa | Safe |
+| **Aero + Cornering** | 0.891 mm | 96.85 MPa | Safe |
+| **Frontal Impact** | 10.52 mm | 315.34 MPa | ⚠ Local Overstress |
 
 ---
 
 ## Key Learnings
 
-* Gained hands-on experience in **beam-based chassis modeling** within ANSYS SpaceClaim.
-* Understood **load path distribution** and **torsional rigidity** behavior.
-* Applied **multiple static load cases** and analyzed corresponding stress/deformation results.
-* Strengthened skills in **meshing, joint definition, and boundary setup** for vehicle structures.
+- Efficient beam FEA enables fast and realistic validation of **racecar frames**.
+- Suspension loads must be modeled using **springs + joints + upright constraints**, not just fixed bodies.
+- Combined stresses (not just von-Mises) should be checked in beam studies.
+- Static frontal loading highlights **reinforcement needs** even when torsional and cornering loads are safe.
 
 ---
 
-## Tools & Technologies
+## Tools Used
 
-* **ANSYS Workbench** (SpaceClaim + Mechanical)
-* **Static Structural Module**
-* **Finite Element Analysis (FEA)**
-
----
-
-## Skills Demonstrated
-
-* Beam & Joint Modeling
-* Structural Strength Evaluation
-* Vehicle Chassis Design
-* Load & Boundary Condition Setup
-* Meshing & Validation
-* Design Optimization & Safety Assessment
+- **ANSYS SpaceClaim**
+- **ANSYS Mechanical (Static Structural)**
+- **Beam, Joint, Spring, Remote Loads & Point Masses**
+- **Stress/Deformation/Load Path Extraction via Beam Tool**
 
 ---
 
@@ -251,14 +309,7 @@ https://github.com/user-attachments/assets/4890b35a-2bd1-45b2-90b1-019527b10514
 
 ---
 
-## Conclusion
 
-The Formula SAE Chassis Analysis effectively validated the frame design for strength, stiffness, and vibration stability under various real-world racing conditions such as torsion, cornering, aerodynamic, and impact loads.
-The FEA results confirmed that stresses remained below the material’s yield strength, ensuring structural integrity and driver safety without unnecessary weight penalties.
-The torsional stiffness and modal frequencies were found to be within the desirable range for high-performance handling, minimizing chassis flex and vibration coupling. This confirms that the chassis design provides an optimal balance between lightweight construction and structural robustness.
-This project provided deep insight into racecar structural analysis, finite element validation, and design-for-performance optimization using ANSYS Workbench — bridging the gap between CAD design and real-world engineering validation.
-
----
 
 ### Author
 **Mohammad Haris**  
