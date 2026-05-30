@@ -312,9 +312,11 @@ https://github.com/user-attachments/assets/4890b35a-2bd1-45b2-90b1-019527b10514
 
 
 ### Author
-**Mohammad Haris**  
-Final Year B.Tech – Mechanical Engineering  
-VIT-AP,Amaravati   
+**Mohammad Haris** — Mechanical Engineer | FEA & CFD Engineer
+
+GitHub: [github.com/MohammadHaris13](https://github.com/MohammadHaris13)
+
+   
 [Linkedin Profile](https://linkedin.com/in/mohammad-haris-13032002) | [Email](mailto:mohammaddharis1303@gmail.com)
 
 ---
